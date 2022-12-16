@@ -1,10 +1,11 @@
 // ignore_for_file: deprecated_member_use
 
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flash_chat/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+const activeSentButtonColor = Colors.lightBlueAccent;
 
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen';
@@ -14,7 +15,10 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final _auth = FirebaseAuth.instance;
+  final _fireStore = FirebaseFirestore.instance;
   User loggedInUser;
+
+  TextEditingController _messageText = TextEditingController();
 
   @override
   void initState() {
@@ -23,7 +27,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void getCurrentUser() async {
-    final user = await _auth.currentUser;
+    final user = _auth.currentUser;
     try {
       if (user != null) {
         loggedInUser = user;
@@ -33,6 +37,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print(loggedInUser.email);
     return Scaffold(
       appBar: AppBar(
         leading: null,
@@ -59,15 +64,19 @@ class _ChatScreenState extends State<ChatScreen> {
                 children: <Widget>[
                   Expanded(
                     child: TextField(
-                      onChanged: (value) {
-                        //Do something with the user input.
-                      },
+                      controller: _messageText,
                       decoration: kMessageTextFieldDecoration,
                     ),
                   ),
                   FlatButton(
                     onPressed: () {
-                      //Implement send functionality.
+                      _fireStore.collection('messages').add({
+                        'sender': loggedInUser.email,
+                        'text': _messageText.text,
+                      });
+                      setState(() {
+                        _messageText.text = '';
+                      });
                     },
                     child: Text(
                       'Send',
