@@ -42,56 +42,61 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         leading: null,
         actions: <Widget>[
-          TextButton(
-              child: Text(
-                "LogOut",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+          IconButton(
+              icon: Icon(Icons.logout_outlined),
               onPressed: () {
                 _auth.signOut();
                 Navigator.pop(context);
               }),
         ],
-        title: Text('⚡️Chat'),
+        title: Text("Let's Talk"),
         backgroundColor: Colors.lightBlueAccent,
       ),
-      body: SafeArea(
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('images/chat_background.png'),
+            fit: BoxFit.fill,
+          ),
+        ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Container(
-              decoration: kMessageContainerDecoration,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Expanded(
-                    child: TextField(
-                      controller: _messageText,
-                      decoration: kMessageTextFieldDecoration,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(18),
+              child: Container(
+                height: 75,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.7),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Expanded(
+                      child: TextField(
+                        controller: _messageText,
+                        decoration: kMessageTextFieldDecoration,
+                      ),
                     ),
-                  ),
-                  IconButton(
-                    splashColor: Color.fromARGB(255, 81, 255, 6),
-                    onPressed: () {
-                      if (_messageText.text.isNotEmpty ||
-                          _messageText.text != ' ') {
-                        _fireStore.collection('messages').add({
-                          'sender': loggedInUser.email,
-                          'text': _messageText.text,
+                    IconButton(
+                      splashColor: Color.fromARGB(255, 81, 255, 6),
+                      onPressed: () {
+                        if (_messageText.text.isNotEmpty ||
+                            _messageText.text != ' ') {
+                          _fireStore.collection('messages').add({
+                            'sender': loggedInUser.email,
+                            'text': _messageText.text,
+                          });
+                        }
+                        setState(() {
+                          _messageText.text = '';
                         });
-                      }
-                      setState(() {
-                        _messageText.text = '';
-                      });
-                    },
-                    icon: Icon(Icons.send_outlined),
-                    color: Colors.lightBlue,
-                  ),
-                ],
+                      },
+                      icon: Icon(Icons.send_outlined),
+                      color: Colors.lightBlue,
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

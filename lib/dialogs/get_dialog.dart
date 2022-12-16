@@ -17,7 +17,7 @@ class GetDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: backgroundColor,
-      title: Text(notificationType),
+      title: Text('$notificationType 🥲'),
       content: Text(content),
       actions: <Widget>[
         TextButton(
