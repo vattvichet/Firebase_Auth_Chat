@@ -1,4 +1,5 @@
 import 'package:flash_chat/components/rounded_button.dart';
+import 'package:flash_chat/dialogs/get_dialog.dart';
 import 'package:flash_chat/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/constants.dart';
@@ -77,6 +78,18 @@ class _LoginScreenState extends State<LoginScreen> {
                         Navigator.pushNamed(context, ChatScreen.id);
                       }
                     } on Exception catch (e) {
+                      setState(() {
+                        showSpinner = false;
+                      });
+                      showDialog(
+                          context: context,
+                          builder: (context) => GetDialog(
+                                notificationType: "LogIn Failed!",
+                                content: "Account Invalid",
+                                backgroundColor: Colors.lightBlueAccent,
+                                buttonColor: Colors.brown,
+                              ));
+
                       print(e);
                     }
                   },

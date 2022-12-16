@@ -42,8 +42,14 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         leading: null,
         actions: <Widget>[
-          IconButton(
-              icon: Icon(Icons.close),
+          TextButton(
+              child: Text(
+                "LogOut",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               onPressed: () {
                 _auth.signOut();
                 Navigator.pop(context);
@@ -68,20 +74,22 @@ class _ChatScreenState extends State<ChatScreen> {
                       decoration: kMessageTextFieldDecoration,
                     ),
                   ),
-                  FlatButton(
+                  IconButton(
+                    splashColor: Color.fromARGB(255, 81, 255, 6),
                     onPressed: () {
-                      _fireStore.collection('messages').add({
-                        'sender': loggedInUser.email,
-                        'text': _messageText.text,
-                      });
+                      if (_messageText.text.isNotEmpty ||
+                          _messageText.text != ' ') {
+                        _fireStore.collection('messages').add({
+                          'sender': loggedInUser.email,
+                          'text': _messageText.text,
+                        });
+                      }
                       setState(() {
                         _messageText.text = '';
                       });
                     },
-                    child: Text(
-                      'Send',
-                      style: kSendButtonTextStyle,
-                    ),
+                    icon: Icon(Icons.send_outlined),
+                    color: Colors.lightBlue,
                   ),
                 ],
               ),
