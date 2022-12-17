@@ -32,7 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
         child: ModalProgressHUD(
           inAsyncCall: showSpinner,
           child: SingleChildScrollView(
-            physics: AlwaysScrollableScrollPhysics(),
+            physics: NeverScrollableScrollPhysics(),
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
@@ -103,11 +103,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                       buttonTitle: 'LogIn'),
                   TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        Navigator.pushNamed(context, RegistrationScreen.id);
-                      },
-                      child: Text("Haven't had account Yet? Click Here!")),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, RegistrationScreen.id);
+                    },
+                    child: Text("Haven't had an account Yet? Click Here!"),
+                  ),
                 ],
               ),
             ),

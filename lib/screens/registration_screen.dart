@@ -106,12 +106,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               }
                             },
                             buttonTitle: 'Register'),
-                        TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              Navigator.pushNamed(context, LoginScreen.id);
-                            },
-                            child: Text("Already has an Account? Click Here!")),
                       ],
                     ),
                   ],
