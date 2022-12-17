@@ -36,19 +36,20 @@ class _ChatScreenState extends State<ChatScreen> {
     } catch (e) {}
   }
 
-  void messagesStream() async {
-    await for (var snapshots in _fireStore.collection('messages').snapshots()) {
-      for (var message in snapshots.docs) {}
-    }
-    // await _fireStore.collection('messages').snapshots().forEach((snapshot) {
-    //   for (var message in snapshot.docs) {
-    //     print(message.data());
-    //   }
-    // });
-  }
+  // void messagesStream() async {
+  //   await for (var snapshots in _fireStore.collection('messages').snapshots()) {
+  //     for (var message in snapshots.docs) {}
+  //   }
+  //   // await _fireStore.collection('messages').snapshots().forEach((snapshot) {
+  //   //   for (var message in snapshot.docs) {
+  //   //     print(message.data());
+  //   //   }
+  //   // });
+  // }
 
   @override
   Widget build(BuildContext context) {
+    // messagesStream();
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
@@ -57,9 +58,8 @@ class _ChatScreenState extends State<ChatScreen> {
           IconButton(
               icon: Icon(Icons.logout_outlined),
               onPressed: () {
-                // _auth.signOut();
-                // Navigator.pop(context);
-                messagesStream();
+                _auth.signOut();
+                Navigator.pop(context);
               }),
         ],
         title: Text("Let's Talk"),
@@ -138,16 +138,27 @@ class _ChatScreenState extends State<ChatScreen> {
                                 return Container();
                               }
                               final messages = snapshot.data.docChanges;
-                              List<Text> messagesWidgets = [];
+                              List<Row> messagesWidgets = [];
                               for (var message in messages) {
                                 final messageText = message.doc['text'];
                                 final messageSender = message.doc['sender'];
-                                final messageWidget = Text(
-                                  '$messageSender :  $messageText',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                final messageWidget = Row(
+                                  children: [
+                                    Text(
+                                      '$messageSender : ',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black),
+                                    ),
+                                    Text(
+                                      ' $messageText',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black),
+                                    ),
+                                  ],
                                 );
                                 messagesWidgets.add(messageWidget);
                               }

@@ -33,7 +33,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         child: ModalProgressHUD(
           inAsyncCall: showSpinner,
           child: SingleChildScrollView(
-            physics: AlwaysScrollableScrollPhysics(),
+            physics: NeverScrollableScrollPhysics(),
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 24.0),
               child: ClipRRect(
