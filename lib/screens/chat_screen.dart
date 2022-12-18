@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -66,22 +67,21 @@ class _ChatScreenState extends State<ChatScreen> {
         backgroundColor: Colors.lightBlueAccent,
       ),
       resizeToAvoidBottomInset: true,
-      body: Column(
-        children: [
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.all(8.0),
-              child: StreamBubbles(),
-            ),
+      body: Container(
+        decoration: BoxDecoration(
+          color: Color.fromARGB(255, 0, 0, 0),
+          image: DecorationImage(
+            image: AssetImage('images/chat_background.png'),
           ),
-        ],
+        ),
+        padding: EdgeInsets.all(10),
+        child: StreamBubbles(),
       ),
       bottomSheet: BottomAppBar(
         child: Container(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(18, 18, 18, 26),
             child: Container(
-              height: 75,
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.7),
                 borderRadius: BorderRadius.circular(18),
@@ -167,7 +167,18 @@ class MessageBubble extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text(sender),
+        Padding(
+          padding: EdgeInsets.all(10),
+          child: Material(
+            borderRadius: BorderRadius.circular(30),
+            elevation: 5,
+            color: Colors.lightBlue,
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 1, horizontal: 10),
+              child: Text(sender),
+            ),
+          ),
+        ),
         Padding(
           padding: EdgeInsets.all(10),
           child: Material(
