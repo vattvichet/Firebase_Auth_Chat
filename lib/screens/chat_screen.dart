@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 const activeSentButtonColor = Colors.lightBlueAccent;
+final _fireStore = FirebaseFirestore.instance;
 
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen';
@@ -15,10 +16,10 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final _auth = FirebaseAuth.instance;
-  final _fireStore = FirebaseFirestore.instance;
+
   User loggedInUser;
 
-  TextEditingController _messageText = TextEditingController();
+  final _messageText = TextEditingController();
 
   @override
   void initState() {
@@ -51,7 +52,6 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     // messagesStream();
     return Scaffold(
-      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         leading: null,
         actions: <Widget>[
@@ -65,112 +65,52 @@ class _ChatScreenState extends State<ChatScreen> {
         title: Text("Let's Talk"),
         backgroundColor: Colors.lightBlueAccent,
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('images/chat_background.png'),
-            fit: BoxFit.fill,
-          ),
-        ),
-        child: SingleChildScrollView(
-          physics: NeverScrollableScrollPhysics(),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minWidth: MediaQuery.of(context).size.width,
-              minHeight: MediaQuery.of(context).size.height,
+      resizeToAvoidBottomInset: true,
+      body: Column(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.all(8.0),
+              child: StreamBubbles(),
             ),
-            child: IntrinsicHeight(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(18, 18, 18, 26),
-                    child: Container(
-                      height: 75,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.7),
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          Expanded(
-                            child: TextField(
-                              controller: _messageText,
-                              decoration: kMessageTextFieldDecoration,
-                            ),
-                          ),
-                          IconButton(
-                            splashColor: Color.fromARGB(255, 81, 255, 6),
-                            onPressed: () {
-                              if (_messageText.text.isNotEmpty ||
-                                  _messageText.text != ' ') {
-                                _fireStore.collection('messages').add({
-                                  'sender': loggedInUser.email,
-                                  'text': _messageText.text,
-                                });
-                              }
-                              setState(() {
-                                _messageText.text = '';
-                              });
-                            },
-                            icon: Icon(Icons.send_outlined),
-                            color: Colors.lightBlue,
-                          ),
-                        ],
-                      ),
+          ),
+        ],
+      ),
+      bottomSheet: BottomAppBar(
+        child: Container(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(18, 18, 18, 26),
+            child: Container(
+              height: 75,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.7),
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Expanded(
+                    child: TextField(
+                      controller: _messageText,
+                      decoration: kMessageTextFieldDecoration,
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(18),
-                    child: Container(
-                      height: 500,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.9),
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      child: Column(
-                        children: [
-                          StreamBuilder<QuerySnapshot>(
-                            stream:
-                                _fireStore.collection('messages').snapshots(),
-                            builder: (context, snapshot) {
-                              if (!snapshot.hasData) {
-                                return Container();
-                              }
-                              final messages = snapshot.data.docChanges;
-                              List<Row> messagesWidgets = [];
-                              for (var message in messages) {
-                                final messageText = message.doc['text'];
-                                final messageSender = message.doc['sender'];
-                                final messageWidget = Row(
-                                  children: [
-                                    Text(
-                                      '$messageSender : ',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black),
-                                    ),
-                                    Text(
-                                      ' $messageText',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black),
-                                    ),
-                                  ],
-                                );
-                                messagesWidgets.add(messageWidget);
-                              }
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: messagesWidgets,
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
+                  IconButton(
+                    splashColor: Color.fromARGB(255, 81, 255, 6),
+                    onPressed: () {
+                      if (_messageText.text.isNotEmpty ||
+                          _messageText.text != ' ') {
+                        _fireStore.collection('messages').add({
+                          'sender': loggedInUser.email,
+                          'text': _messageText.text,
+                        });
+                      }
+                      setState(() {
+                        _messageText.text = '';
+                      });
+                    },
+                    icon: Icon(Icons.send_outlined),
+                    color: Colors.lightBlue,
                   ),
                 ],
               ),
@@ -178,6 +118,72 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class StreamBubbles extends StatelessWidget {
+  const StreamBubbles({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        StreamBuilder<QuerySnapshot>(
+          stream: _fireStore.collection('messages').snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return Container();
+            }
+            final messages = snapshot.data.docChanges;
+            List<MessageBubble> messagesBubbles = [];
+            for (var message in messages) {
+              final messageText = message.doc['text'];
+              final messageSender = message.doc['sender'];
+              final messageBubble = MessageBubble(
+                sender: messageSender,
+                text: messageText,
+              );
+              messagesBubbles.add(messageBubble);
+            }
+            return Expanded(
+              child: ListView(
+                children: messagesBubbles,
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class MessageBubble extends StatelessWidget {
+  const MessageBubble({Key key, this.sender, this.text}) : super(key: key);
+  final String sender;
+  final String text;
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text(sender),
+        Padding(
+          padding: EdgeInsets.all(10),
+          child: Material(
+            borderRadius: BorderRadius.circular(30),
+            elevation: 5,
+            color: Colors.lightBlue,
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+              child: Text(
+                text,
+                style: TextStyle(fontSize: 15),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
