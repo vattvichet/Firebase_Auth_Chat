@@ -31,86 +31,87 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Center(
         child: ModalProgressHUD(
           inAsyncCall: showSpinner,
-          child: SingleChildScrollView(
-            physics: NeverScrollableScrollPhysics(),
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Hero(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Flexible(
+                  child: Hero(
                     tag: 'logo',
                     child: Container(
                       height: 200.0,
                       child: Image.asset('images/logo.png'),
                     ),
                   ),
-                  SizedBox(
-                    height: 10.0,
-                  ),
-                  TextField(
-                    controller: _emailInput,
-                    keyboardType: TextInputType.emailAddress,
-                    textAlign: TextAlign.center,
-                    decoration: kTextFieldDecoration.copyWith(
-                        hintText: 'Enter your email'),
-                  ),
-                  SizedBox(
-                    height: 8.0,
-                  ),
-                  TextField(
-                    controller: _passwordInput,
-                    obscureText: true,
-                    textAlign: TextAlign.center,
-                    decoration: kTextFieldDecoration.copyWith(
-                        hintText: 'Enter your password'),
-                  ),
-                  SizedBox(
-                    height: 10.0,
-                  ),
-                  RoundedButton(
-                      buttonColor: Colors.lightBlueAccent,
-                      onPressed: () async {
-                        setState(() {
-                          showSpinner = true;
-                        });
-                        try {
-                          final loggedInUser =
-                              await _auth.signInWithEmailAndPassword(
-                                  email: _emailInput.text,
-                                  password: _passwordInput.text);
-                          if (loggedInUser != null) {
-                            setState(() {
-                              showSpinner = false;
-                            });
-                            Navigator.pushNamed(context, ChatScreen.id);
-                          }
-                        } on Exception catch (e) {
+                ),
+                SizedBox(
+                  height: 40,
+                ),
+                TextField(
+                  controller: _emailInput,
+                  keyboardType: TextInputType.emailAddress,
+                  textAlign: TextAlign.center,
+                  decoration: kTextFieldDecoration.copyWith(
+                      hintText: 'Enter your email'),
+                ),
+                SizedBox(
+                  height: 8.0,
+                ),
+                TextField(
+                  controller: _passwordInput,
+                  obscureText: true,
+                  textAlign: TextAlign.center,
+                  decoration: kTextFieldDecoration.copyWith(
+                      hintText: 'Enter your password'),
+                ),
+                SizedBox(
+                  height: 10.0,
+                ),
+                RoundedButton(
+                    buttonColor: Colors.lightBlueAccent,
+                    onPressed: () async {
+                      setState(() {
+                        showSpinner = true;
+                      });
+                      try {
+                        final loggedInUser =
+                            await _auth.signInWithEmailAndPassword(
+                                email: _emailInput.text,
+                                password: _passwordInput.text);
+                        if (loggedInUser != null) {
                           setState(() {
                             showSpinner = false;
                           });
-                          showDialog(
-                              context: context,
-                              builder: (context) => GetDialog(
-                                    notificationType: "LogIn Failed!",
-                                    content: "Account Invalid",
-                                    backgroundColor: Colors.lightBlueAccent,
-                                    buttonColor: Colors.brown,
-                                  ));
-
-                          print(e);
+                          await Navigator.pushNamed(context, ChatScreen.id);
+                          _emailInput.text = '';
+                          _passwordInput.text = '';
                         }
-                      },
-                      buttonTitle: 'LogIn'),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      Navigator.pushNamed(context, RegistrationScreen.id);
+                      } on Exception catch (e) {
+                        setState(() {
+                          showSpinner = false;
+                        });
+                        showDialog(
+                            context: context,
+                            builder: (context) => GetDialog(
+                                  notificationType: "LogIn Failed!",
+                                  content: "Account Invalid",
+                                  backgroundColor: Colors.lightBlueAccent,
+                                  buttonColor: Colors.brown,
+                                ));
+
+                        print(e);
+                      }
                     },
-                    child: Text("Haven't had an account Yet? Click Here!"),
-                  ),
-                ],
-              ),
+                    buttonTitle: 'LogIn'),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, RegistrationScreen.id);
+                  },
+                  child: Text("Haven't had an account Yet? Click Here!"),
+                ),
+              ],
             ),
           ),
         ),

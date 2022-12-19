@@ -32,84 +32,72 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       body: Center(
         child: ModalProgressHUD(
           inAsyncCall: showSpinner,
-          child: SingleChildScrollView(
-            physics: NeverScrollableScrollPhysics(),
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.0),
-              child: ClipRRect(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Hero(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24.0),
+            child: ClipRRect(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Flexible(
+                    child: Hero(
                       tag: 'logo',
                       child: Container(
                         height: 200.0,
                         child: Image.asset('images/logo.png'),
                       ),
                     ),
-                    SizedBox(
-                      height: 10.0,
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        TextField(
-                          controller: _usernameInput,
-                          keyboardType: TextInputType.emailAddress,
-                          textAlign: TextAlign.center,
-                          decoration: kTextFieldDecoration.copyWith(
-                            hintText: 'Username',
-                          ),
-                        ),
-                        SizedBox(
-                          height: 8.0,
-                        ),
-                        TextField(
-                          controller: _emailInput,
-                          keyboardType: TextInputType.emailAddress,
-                          textAlign: TextAlign.center,
-                          decoration: kTextFieldDecoration.copyWith(
-                              hintText: 'Enter your email'),
-                        ),
-                        SizedBox(
-                          height: 8.0,
-                        ),
-                        TextField(
-                          controller: _passwordInput,
-                          obscureText: true,
-                          textAlign: TextAlign.center,
-                          decoration: kTextFieldDecoration.copyWith(
-                              hintText: 'Enter your password'),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        RoundedButton(
-                            buttonColor: Colors.blueAccent,
-                            onPressed: () async {
-                              setState(() {
-                                showSpinner = true;
-                              });
-                              try {
-                                final newUser =
-                                    await _auth.createUserWithEmailAndPassword(
-                                        email: _emailInput.text,
-                                        password: _passwordInput.text);
-                                if (newUser != null) {
-                                  setState(() {
-                                    showSpinner = false;
-                                  });
-                                  Navigator.pushNamed(context, ChatScreen.id);
-                                }
-                              } catch (e) {
-                                print(e);
+                  ),
+                  SizedBox(
+                    height: 40.0,
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      TextField(
+                        controller: _emailInput,
+                        keyboardType: TextInputType.emailAddress,
+                        textAlign: TextAlign.center,
+                        decoration: kTextFieldDecoration.copyWith(
+                            hintText: 'Enter your email'),
+                      ),
+                      SizedBox(
+                        height: 8.0,
+                      ),
+                      TextField(
+                        controller: _passwordInput,
+                        obscureText: true,
+                        textAlign: TextAlign.center,
+                        decoration: kTextFieldDecoration.copyWith(
+                            hintText: 'Enter your password'),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      RoundedButton(
+                          buttonColor: Colors.blueAccent,
+                          onPressed: () async {
+                            setState(() {
+                              showSpinner = true;
+                            });
+                            try {
+                              final newUser =
+                                  await _auth.createUserWithEmailAndPassword(
+                                      email: _emailInput.text,
+                                      password: _passwordInput.text);
+                              if (newUser != null) {
+                                setState(() {
+                                  showSpinner = false;
+                                });
+                                Navigator.pushNamed(context, ChatScreen.id);
                               }
-                            },
-                            buttonTitle: 'Register'),
-                      ],
-                    ),
-                  ],
-                ),
+                            } catch (e) {
+                              print(e);
+                            }
+                          },
+                          buttonTitle: 'Register'),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),

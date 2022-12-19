@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 const activeSentButtonColor = Colors.lightBlueAccent;
 final _fireStore = FirebaseFirestore.instance;
+User loggedInUser;
 
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen';
@@ -17,8 +18,6 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final _auth = FirebaseAuth.instance;
-
-  User loggedInUser;
 
   final _messageText = TextEditingController();
 
@@ -99,10 +98,11 @@ class _ChatScreenState extends State<ChatScreen> {
                     splashColor: Color.fromARGB(255, 81, 255, 6),
                     onPressed: () {
                       if (_messageText.text.isNotEmpty ||
-                          _messageText.text != ' ') {
+                          _messageText.text != '') {
                         _fireStore.collection('messages').add({
                           'sender': loggedInUser.email,
                           'text': _messageText.text,
+                          'timestamp': FieldValue.serverTimestamp(),
                         });
                       }
                       setState(() {
@@ -130,24 +130,30 @@ class StreamBubbles extends StatelessWidget {
     return Column(
       children: [
         StreamBuilder<QuerySnapshot>(
-          stream: _fireStore.collection('messages').snapshots(),
+          stream: _fireStore
+              .collection('messages')
+              .orderBy('timestamp')
+              .snapshots(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
               return Container();
             }
-            final messages = snapshot.data.docChanges;
+            final messages = snapshot.data.docChanges.reversed;
             List<MessageBubble> messagesBubbles = [];
             for (var message in messages) {
               final messageText = message.doc['text'];
               final messageSender = message.doc['sender'];
+
               final messageBubble = MessageBubble(
                 sender: messageSender,
                 text: messageText,
+                isMe: loggedInUser.email == messageSender,
               );
               messagesBubbles.add(messageBubble);
             }
             return Expanded(
               child: ListView(
+                reverse: true,
                 children: messagesBubbles,
               ),
             );
@@ -159,32 +165,57 @@ class StreamBubbles extends StatelessWidget {
 }
 
 class MessageBubble extends StatelessWidget {
-  const MessageBubble({Key key, this.sender, this.text}) : super(key: key);
+  const MessageBubble({Key key, this.sender, this.text, this.isMe})
+      : super(key: key);
   final String sender;
   final String text;
+  final bool isMe;
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment:
+          isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: EdgeInsets.all(10),
+          padding: EdgeInsets.all(0),
           child: Material(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: isMe
+                ? BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    bottomLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                  )
+                : BorderRadius.only(
+                    topRight: Radius.circular(30),
+                    bottomRight: Radius.circular(30),
+                    topLeft: Radius.circular(30),
+                  ),
             elevation: 5,
-            color: Colors.lightBlue,
+            color: Color.fromARGB(255, 121, 157, 193),
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 1, horizontal: 10),
-              child: Text(sender),
+              child: Text(isMe ? 'By You' : '$sender'),
             ),
           ),
         ),
         Padding(
-          padding: EdgeInsets.all(10),
+          padding: EdgeInsets.all(5),
           child: Material(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: isMe
+                ? BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    bottomLeft: Radius.circular(30),
+                    bottomRight: Radius.circular(30),
+                  )
+                : BorderRadius.only(
+                    topRight: Radius.circular(30),
+                    bottomRight: Radius.circular(30),
+                    bottomLeft: Radius.circular(30),
+                  ),
             elevation: 5,
-            color: Colors.lightBlue,
+            color: isMe
+                ? Color.fromARGB(215, 255, 154, 248)
+                : Color.fromARGB(215, 185, 233, 134),
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
               child: Text(
@@ -193,6 +224,9 @@ class MessageBubble extends StatelessWidget {
               ),
             ),
           ),
+        ),
+        Container(
+          padding: EdgeInsets.only(bottom: 50),
         ),
       ],
     );
