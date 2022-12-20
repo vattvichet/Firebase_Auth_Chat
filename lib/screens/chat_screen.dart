@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 const activeSentButtonColor = Colors.lightBlueAccent;
 final _fireStore = FirebaseFirestore.instance;
+//
 User loggedInUser;
 
 class ChatScreen extends StatefulWidget {
